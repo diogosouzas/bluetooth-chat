@@ -1,16 +1,18 @@
 package com.sdiogosouza.bluetoothchat.presentation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.KeyboardType.Companion.Text
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,7 +39,9 @@ fun ChatMessage(
             .background(
                 if (message.isFromLocalUser) OldRose else Vanilla
             )
-            .padding(16.dp)
+            .padding(16.dp),
+        horizontalAlignment = if (message.isFromLocalUser) Alignment.End else Alignment.Start,
+        verticalArrangement = Arrangement.Center
     ) {
         Text(
             text = message.senderName,
@@ -47,14 +51,17 @@ fun ChatMessage(
         Text(
             text = message.message,
             color = Color.Black,
-            modifier = Modifier.widthIn(max = 250.dp)
+            modifier = Modifier
+                .widthIn(max = 250.dp)
+                .fillMaxHeight()
+                .align(if (message.isFromLocalUser) Alignment.End else Alignment.Start)
         )
     }
 }
 
 @Preview
 @Composable
-fun ChatMessagePreview() {
+fun ChatMessageBubblePreview() {
     BluetoothChatTheme {
         ChatMessage(
             message = BluetoothMessage(

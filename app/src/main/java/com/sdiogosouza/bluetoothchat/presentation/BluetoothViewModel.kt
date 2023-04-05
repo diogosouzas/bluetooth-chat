@@ -6,10 +6,18 @@ import com.sdiogosouza.bluetoothchat.domain.chat.BluetoothController
 import com.sdiogosouza.bluetoothchat.domain.chat.BluetoothDeviceDomain
 import com.sdiogosouza.bluetoothchat.domain.chat.ConnectionResult
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class BluetoothViewModel @Inject constructor(
@@ -43,6 +51,11 @@ class BluetoothViewModel @Inject constructor(
                 )
             }
         }.launchIn(viewModelScope)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        bluetoothController.release()
     }
 
     fun connectToDevice(device: BluetoothDeviceDomain) {
@@ -120,21 +133,14 @@ class BluetoothViewModel @Inject constructor(
                     }
                 }
             }
-        }
-            .catch { throwable ->
-                bluetoothController.closeConnection()
-                _state.update {
-                    it.copy(
-                        isConnected = false,
-                        isConnecting = false,
-                    )
-                }
+        }.catch { throwable ->
+            bluetoothController.closeConnection()
+            _state.update {
+                it.copy(
+                    isConnected = false,
+                    isConnecting = false,
+                )
             }
-            .launchIn(viewModelScope)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        bluetoothController.release()
+        }.launchIn(viewModelScope)
     }
 }

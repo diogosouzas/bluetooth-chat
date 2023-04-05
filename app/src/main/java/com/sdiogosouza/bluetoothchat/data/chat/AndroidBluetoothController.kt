@@ -14,12 +14,12 @@ import com.sdiogosouza.bluetoothchat.domain.chat.BluetoothDeviceDomain
 import com.sdiogosouza.bluetoothchat.domain.chat.BluetoothMessage
 import com.sdiogosouza.bluetoothchat.domain.chat.ConnectionResult
 import com.sdiogosouza.bluetoothchat.domain.chat.ConnectionResult.*
+import java.io.IOException
+import java.util.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.io.IOException
-import java.util.*
 
 @SuppressLint("MissingPermission")
 class AndroidBluetoothController(

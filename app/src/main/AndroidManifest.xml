@@ -23,7 +23,6 @@
         <activity
             android:name="com.sdiogosouza.bluetoothchat.presentation.MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:theme="@style/Theme.BluetoothChat">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

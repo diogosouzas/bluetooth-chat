@@ -3,12 +3,12 @@ package com.sdiogosouza.bluetoothchat.data.chat
 import android.bluetooth.BluetoothSocket
 import com.sdiogosouza.bluetoothchat.domain.chat.BluetoothMessage
 import com.sdiogosouza.bluetoothchat.domain.chat.TransferFailedException
+import java.io.IOException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
-import java.io.IOException
 
 class BluetoothDataTransferService(private val socket: BluetoothSocket) {
 
