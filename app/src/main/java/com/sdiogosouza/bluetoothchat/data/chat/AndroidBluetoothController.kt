@@ -1,11 +1,15 @@
 package com.sdiogosouza.bluetoothchat.data.chat
 
-import android.Manifest.*
-import android.Manifest.permission.*
+import android.Manifest.permission.BLUETOOTH_CONNECT
+import android.Manifest.permission.BLUETOOTH_SCAN
 import android.annotation.SuppressLint
-import android.bluetooth.*
-import android.bluetooth.BluetoothAdapter.*
-import android.bluetooth.BluetoothDevice.*
+import android.bluetooth.BluetoothAdapter.ACTION_CONNECTION_STATE_CHANGED
+import android.bluetooth.BluetoothDevice.ACTION_ACL_CONNECTED
+import android.bluetooth.BluetoothDevice.ACTION_ACL_DISCONNECTED
+import android.bluetooth.BluetoothDevice.ACTION_FOUND
+import android.bluetooth.BluetoothManager
+import android.bluetooth.BluetoothServerSocket
+import android.bluetooth.BluetoothSocket
 import android.content.Context
 import android.content.IntentFilter
 import android.content.pm.PackageManager
@@ -13,12 +17,25 @@ import com.sdiogosouza.bluetoothchat.domain.chat.BluetoothController
 import com.sdiogosouza.bluetoothchat.domain.chat.BluetoothDeviceDomain
 import com.sdiogosouza.bluetoothchat.domain.chat.BluetoothMessage
 import com.sdiogosouza.bluetoothchat.domain.chat.ConnectionResult
-import com.sdiogosouza.bluetoothchat.domain.chat.ConnectionResult.*
+import com.sdiogosouza.bluetoothchat.domain.chat.ConnectionResult.ConnectionEstablished
+import com.sdiogosouza.bluetoothchat.domain.chat.ConnectionResult.TransferSucceeded
 import java.io.IOException
-import java.util.*
+import java.util.UUID
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @SuppressLint("MissingPermission")
@@ -123,9 +140,9 @@ class AndroidBluetoothController(
                     null
                 }
                 emit(ConnectionEstablished)
-                currentClientSocket?.let {
+                currentClientSocket?.let { bluetoothSocket ->
                     currentServerSocket?.close()
-                    val service = BluetoothDataTransferService(it)
+                    val service = BluetoothDataTransferService(bluetoothSocket)
                     dataTransferService = service
 
                     emitAll(
@@ -175,7 +192,7 @@ class AndroidBluetoothController(
             }
         }.onCompletion {
             closeConnection()
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(Dispatchers.IO) as Flow<ConnectionResult>
     }
 
     override suspend fun trySendMessage(message: String): BluetoothMessage? {
@@ -228,6 +245,6 @@ class AndroidBluetoothController(
     }
 
     private companion object {
-        const val SERVICE_UUID = "27b7d1da-08c7-4505-a6d1-2459987e5e2d"
+        const val SERVICE_UUID = "ab810eb0-d3b0-11ed-afa1-0242ac120002"
     }
 }
